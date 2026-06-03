@@ -89,5 +89,42 @@ public class main {
  
         System.out.println("After setters:");
         book5.displayInfo();
+
+         // =====================================================
+        // Copy Constructor
+        // =====================================================
+        System.out.println("\n=== Copy constructor ===\n");
+ 
+        Books book6 = new Books(book2);   // Copy of Harry Potter
+        book6.setId(106);
+        book6.setName("Harry Potter: Chamber of Secrets");
+ 
+        System.out.println("Original book2 (unchanged):");
+        book2.displayInfo();
+        System.out.println("New book6 (copy, modified):");
+        book6.displayInfo();
+ 
+ 
+        // =====================================================
+        // Using getters to read specific fields
+        // =====================================================
+        System.out.println("\n=== Using getters ===\n");
+        System.out.println("book3 name            : " + book3.getName());
+        System.out.println("book3 author          : " + book3.getAuthor());
+        System.out.println("book3 genre           : " + book3.getGenre());
+        System.out.println("book3 total copies    : " + book3.getTotalCopies());
+        System.out.println("book3 available copies: " + book3.getAvailableCopies());
+        System.out.println("book3 available?      : " + book3.isAvailable());
+ 
+    }
 }
-}
+ 
+/*
+ * HOW TO RUN:
+ * 1. Save both files in the same folder
+ * 2. Open terminal in that folder
+ * 3. javac Book.java Main.java
+ * 4. java Main
+ */
+ 
+
