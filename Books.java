@@ -15,163 +15,171 @@
  *
  * This is encapsulation: hide the data, control access through methods.
  */
- 
-
 
 public class Books {
-    int id;
-    String name;
-    String author;
-    String genre;
-    int totalCopies;
-    int availableCopies;
+
+    // =========================================================
+    // FIELDS — all private now
+    // =========================================================
+    // The keyword "private" means: only code INSIDE this class
+    // can read or write these fields directly.
+    // Everyone else MUST go through getters and setters.
+
+    private int id;
+    private String title;
+    private String author;
+    private String genre;
+    private int totalCopies;
+    private int availableCopies;
 
 
-    //constructor which is default when there is not more information we will use it then
+    // =========================================================
+    // CONSTRUCTORS — unchanged from Day 1
+    // =========================================================
 
-    Books(){
-        this.id=0;
-        this.name="Unknown name";
-        this.author="Unknown author";
-        this.genre="Unknown genre";
-        this.totalCopies=0;
-        this.availableCopies=0;
+    public Books() {
+        this.id              = 0;
+        this.title           = "Unknown Title";
+        this.author          = "Unknown Author";
+        this.genre           = "Uncategorized";
+        this.totalCopies     = 1;
+        this.availableCopies = 1;
     }
 
-
-
-    // =========================================================
-    // CONSTRUCTOR 2 — Parameterized Constructor
-    // =========================================================
-    // Creates a book with all values provided upfront.
-    //
-    // IMPORTANT DESIGN DECISION:
-    // We take totalCopies as a parameter, but NOT availableCopies.
-    // WHY? Because when a book is first added to the library,
-    // ALL copies are available. It would be a mistake to let
-    // someone accidentally say availableCopies > totalCopies.
-    // So we set availableCopies = totalCopies automatically.
-
-    Books(int id, String name, String author, String genre, int totalCopies){
-        this.id = id;
-        this.name = name;
-        this.author = author;
-        this.genre = genre;
-        this.totalCopies = totalCopies;
-        this.availableCopies = totalCopies;
+    public Books(int id, String title, String author, String genre, int totalCopies) {
+        // Use setters here so validation runs even during construction
+        setId(id);
+        setTitle(title);
+        setAuthor(author);
+        setGenre(genre);
+        setTotalCopies(totalCopies);
+        this.availableCopies = this.totalCopies;
     }
 
-
-    // =========================================================
-    // CONSTRUCTOR 3 — Copy Constructor
-    // =========================================================
-    // Creates a NEW Book object by copying all values from another Book.
-    // Changing this new book will NOT affect the original.
-    //
-    // Use case: you want to create a "duplicate entry" of an existing book.
- 
-    Books(Books other) {
+    public Books(Books other) {
         this.id              = other.id;
-        this.name           = other.name;
+        this.title           = other.title;
         this.author          = other.author;
         this.genre           = other.genre;
         this.totalCopies     = other.totalCopies;
         this.availableCopies = other.availableCopies;
     }
- 
- 
+
+
     // =========================================================
-    // GETTERS
+    // GETTERS — public so anyone can READ the fields
     // =========================================================
- 
-    int getId()               { return this.id; }
-    String getName()         { return this.name; }
-    String getAuthor()        { return this.author; }
-    String getGenre()         { return this.genre; }
-    int getTotalCopies()      { return this.totalCopies; }
-    int getAvailableCopies()  { return this.availableCopies; }
- 
- 
-    // =========================================================
-    // isAvailable() — CALCULATED method, not a stored field
-    // =========================================================
-    // This used to be a stored boolean field: boolean isAvailable
-    // Now it is a METHOD that COMPUTES the answer on the spot.
-    //
-    // Think of it like asking: "Is the shop open?"
-    // You don't store the answer — you check the clock and calculate it.
-    //
-    // RETURN TYPE: boolean (true = at least 1 copy on shelf)
- 
-    boolean isAvailable() {
+    // Notice: getters have no validation — reading is always safe.
+    // Only writing (setters) needs to be controlled.
+
+    public int getId()               { return this.id; }
+    public String getTitle()         { return this.title; }
+    public String getAuthor()        { return this.author; }
+    public String getGenre()         { return this.genre; }
+    public int getTotalCopies()      { return this.totalCopies; }
+    public int getAvailableCopies()  { return this.availableCopies; }
+
+    public boolean isAvailable() {
         return this.availableCopies > 0;
     }
- 
- 
+
+
     // =========================================================
-    // SETTERS
+    // SETTERS — public but with VALIDATION
     // =========================================================
- 
-    void setId(int id)                       { this.id = id; }
-    void setName(String name)              { this.name = name; }
-    void setAuthor(String author)            { this.author = author; }
-    void setGenre(String genre)              { this.genre = genre; }
-    void setTotalCopies(int totalCopies)     { this.totalCopies = totalCopies; }
-    void setAvailableCopies(int availableCopies) {
-        // Basic guard: available copies can never exceed total copies
-        // and can never go below 0
-        if (availableCopies < 0) {
-            this.availableCopies = 0;
-        } else if (availableCopies > this.totalCopies) {
-            this.availableCopies = this.totalCopies;
-        } else {
-            this.availableCopies = availableCopies;
-        }
-    }
- 
- 
-    // =========================================================
-    // borrow() — reduces availableCopies by 1
-    // =========================================================
-    // Called when a member borrows this book.
-    // Returns true if borrow was successful, false if no copies left.
+    // This is the heart of Day 2.
+    // Each setter now checks if the value makes sense
+    // before actually storing it.
     //
-    // WHY return boolean?
-    // The caller (Main or Librarian) needs to know if the borrow worked.
-    // If we returned void, they'd have no way to know it failed silently.
- 
-    boolean borrow() {
-        if (this.availableCopies > 0) {
-            this.availableCopies--;   // availableCopies = availableCopies - 1
-            return true;              // Borrow succeeded
+    // PATTERN used: if invalid → print warning and return early
+    //               if valid   → store the value
+
+    public void setId(int id) {
+        if (id <= 0) {
+            System.out.println("Warning: Book ID must be positive. Ignoring value: " + id);
+            return; // exit the method without changing the field
         }
-        return false;                 // No copies available, borrow failed
+        this.id = id;
     }
- 
- 
+
+    public void setTitle(String title) {
+        // Rule: title cannot be null or empty/blank
+        if (title == null || title.trim().isEmpty()) {
+            System.out.println("Warning: Book title cannot be empty. Ignoring.");
+            return;
+        }
+        // trim() removes leading/trailing spaces: "  Harry Potter  " → "Harry Potter"
+        this.title = title.trim();
+    }
+
+    public void setAuthor(String author) {
+        if (author == null || author.trim().isEmpty()) {
+            System.out.println("Warning: Author name cannot be empty. Ignoring.");
+            return;
+        }
+        this.author = author.trim();
+    }
+
+    public void setGenre(String genre) {
+        if (genre == null || genre.trim().isEmpty()) {
+            this.genre = "Uncategorized"; // default fallback instead of warning
+            return;
+        }
+        this.genre = genre.trim();
+    }
+
+    public void setTotalCopies(int totalCopies) {
+        if (totalCopies <= 0) {
+            System.out.println("Warning: Total copies must be at least 1. Ignoring value: " + totalCopies);
+            return;
+        }
+        this.totalCopies = totalCopies;
+    }
+
+    public void setAvailableCopies(int availableCopies) {
+        if (availableCopies < 0) {
+            System.out.println("Warning: Available copies cannot be negative.");
+            return;
+        }
+        if (availableCopies > this.totalCopies) {
+            System.out.println("Warning: Available copies cannot exceed total copies.");
+            return;
+        }
+        this.availableCopies = availableCopies;
+    }
+
+
     // =========================================================
-    // returnBook() — increases availableCopies by 1
+    // BORROW / RETURN — unchanged logic, now use private fields
     // =========================================================
-    // Called when a member returns this book.
-    // Returns true if return was successful.
- 
-    boolean returnBook() {
-        if (this.availableCopies < this.totalCopies) {
-            this.availableCopies++;   // One more copy back on the shelf
+
+    public boolean borrow() {
+        if (this.availableCopies > 0) {
+            this.availableCopies--;
             return true;
         }
-        return false; // All copies already on shelf — something went wrong
+        System.out.println("Cannot borrow '" + this.title + "': no copies available.");
+        return false;
     }
- 
- 
+
+    public boolean returnBook() {
+        if (this.availableCopies < this.totalCopies) {
+            this.availableCopies++;
+            return true;
+        }
+        System.out.println("Cannot return '" + this.title + "': all copies already on shelf.");
+        return false;
+    }
+
+
     // =========================================================
-    // displayInfo() — prints a summary of this book
+    // displayInfo()
     // =========================================================
- 
-    void displayInfo() {
+
+    public void displayInfo() {
         System.out.println("-----------------------------");
         System.out.println("Book ID          : " + this.id);
-        System.out.println("Name             : " + this.name);
+        System.out.println("Title            : " + this.title);
         System.out.println("Author           : " + this.author);
         System.out.println("Genre            : " + this.genre);
         System.out.println("Total Copies     : " + this.totalCopies);
@@ -179,7 +187,4 @@ public class Books {
         System.out.println("Status           : " + (isAvailable() ? "Available" : "All Copies Borrowed"));
         System.out.println("-----------------------------");
     }
- 
 }
- 
-
