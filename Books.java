@@ -1,3 +1,23 @@
+/*
+ * ============================================================
+ * DAY 2 — Book.java  (Refactored for Encapsulation)
+ * ============================================================
+ *
+ * WHAT CHANGED FROM DAY 1:
+ *   - All fields changed from default access → private
+ *   - Setters now have VALIDATION (they reject bad data)
+ *   - Nothing else changes — same fields, same methods
+ *
+ * WHY private?
+ *   Before:  book1.title = "";   <-- anyone could corrupt the data
+ *   After:   book1.title = "";   <-- COMPILE ERROR. Forced to use setTitle()
+ *            book1.setTitle(""); <-- setter rejects empty string
+ *
+ * This is encapsulation: hide the data, control access through methods.
+ */
+ 
+
+
 public class Books {
     int id;
     String name;
