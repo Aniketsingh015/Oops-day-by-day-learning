@@ -126,6 +126,65 @@ public class Member {
             this.maxBorrowLimit = 3;
         }
     }
-    
-    
+    // =========================================================
+    // BORROW / RETURN a book title
+    // =========================================================
+    // For now we track book titles as Strings.
+    // On Day 6 we'll upgrade to actual Book objects.
+ 
+    public boolean borrowBook(String bookTitle) {
+        // Check 1: has this member hit their limit?
+        if (!canBorrow()) {
+            System.out.println(this.name + " has reached the borrow limit of " + this.maxBorrowLimit + ".");
+            return false;
+        }
+        // Check 2: do they already have this book?
+        if (this.borrowedBooks.contains(bookTitle)) {
+            System.out.println(this.name + " has already borrowed '" + bookTitle + "'.");
+            return false;
+        }
+        // All checks passed — add to their list
+        this.borrowedBooks.add(bookTitle);
+        System.out.println(this.name + " borrowed '" + bookTitle + "'.");
+        return true;
+    }
+ 
+    public boolean returnBook(String bookTitle) {
+        // remove() returns true if the item was found and removed
+        if (this.borrowedBooks.remove(bookTitle)) {
+            System.out.println(this.name + " returned '" + bookTitle + "'.");
+            return true;
+        }
+        System.out.println(this.name + " does not have '" + bookTitle + "' in their list.");
+        return false;
+    }
+ 
+ 
+    // =========================================================
+    // displayProfile()
+    // =========================================================
+ 
+    public void displayProfile() {
+        System.out.println("=============================");
+        System.out.println("Member ID    : " + this.id);
+        System.out.println("Name         : " + this.name);
+        System.out.println("Email        : " + this.email);
+        System.out.println("Type         : " + this.memberType);
+        System.out.println("Borrow Limit : " + this.maxBorrowLimit);
+        System.out.println("Borrowed     : " + getBorrowedCount() + " / " + this.maxBorrowLimit);
+ 
+        if (this.borrowedBooks.isEmpty()) {
+            System.out.println("Books        : (none)");
+        } else {
+            System.out.println("Books        : ");
+            // Enhanced for-loop: reads as "for each book in borrowedBooks"
+            for (String book : this.borrowedBooks) {
+                System.out.println("               - " + book);
+            }
+        }
+        System.out.println("=============================");
+    }
 }
+    
+    
+
