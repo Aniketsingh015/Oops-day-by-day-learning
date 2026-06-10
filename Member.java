@@ -68,6 +68,64 @@ public class Member {
     public boolean canBorrow() {
         return this.borrowedBooks.size() < this.maxBorrowLimit;
     }
+
+    // =========================================================
+    // SETTERS — with validation
+    // =========================================================
+ 
+    public void setId(int id) {
+        if (id <= 0) {
+            System.out.println("Warning: Member ID must be positive. Ignoring: " + id);
+            return;
+        }
+        this.id = id;
+    }
+ 
+    public void setName(String name) {
+        if (name == null || name.trim().isEmpty()) {
+            System.out.println("Warning: Member name cannot be empty. Ignoring.");
+            return;
+        }
+        // Only letters and spaces allowed in a name
+        // matches() checks if the string fits a pattern
+        // "[a-zA-Z ]+" means: one or more letters or spaces
+        if (!name.trim().matches("[a-zA-Z ]+")) {
+            System.out.println("Warning: Name should contain only letters. Ignoring: " + name);
+            return;
+        }
+        this.name = name.trim();
+    }
+ 
+    public void setEmail(String email) {
+        if (email == null || email.trim().isEmpty()) {
+            System.out.println("Warning: Email cannot be empty. Ignoring.");
+            return;
+        }
+        // Basic email check: must contain "@" and a "."
+        // contains() checks if a string includes a substring
+        if (!email.contains("@") || !email.contains(".")) {
+            System.out.println("Warning: Invalid email format. Must contain '@' and '.'. Ignoring: " + email);
+            return;
+        }
+        this.email = email.trim().toLowerCase();
+    }
+ 
+    public void setMemberType(String memberType) {
+        if (memberType == null) {
+            this.memberType  = "STUDENT";
+            this.maxBorrowLimit = 3;
+            return;
+        }
+        // toUpperCase() so "student", "Student", "STUDENT" all work
+        String type = memberType.toUpperCase();
+        if (type.equals("TEACHER")) {
+            this.memberType     = "TEACHER";
+            this.maxBorrowLimit = 5;   // teachers get higher limit
+        } else {
+            this.memberType     = "STUDENT";
+            this.maxBorrowLimit = 3;
+        }
+    }
     
     
 }
