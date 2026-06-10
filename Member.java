@@ -48,6 +48,26 @@ public class Member {
         setMemberType(memberType);     // this also sets maxBorrowLimit
         this.borrowedBooks = new ArrayList<>();  // start with empty list
     }
+    // =========================================================
+    // GETTERS
+    // =========================================================
+ 
+    public int getId()                          { return this.id; }
+    public String getName()                     { return this.name; }
+    public String getEmail()                    { return this.email; }
+    public String getMemberType()               { return this.memberType; }
+    public int getMaxBorrowLimit()              { return this.maxBorrowLimit; }
+    public ArrayList<String> getBorrowedBooks() { return this.borrowedBooks; }
+ 
+    // Calculated — how many books are currently borrowed
+    public int getBorrowedCount() {
+        return this.borrowedBooks.size();
+    }
+ 
+    // Calculated — can this member borrow more books?
+    public boolean canBorrow() {
+        return this.borrowedBooks.size() < this.maxBorrowLimit;
+    }
     
     
 }
