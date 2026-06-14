@@ -18,7 +18,7 @@
  *   - displayInfo() → abstract, because each person type displays differently
  */
  
-public class Person {
+public abstract class Person {
      // =========================================================
     // FIELDS — private, same as always
     // =========================================================
@@ -66,5 +66,57 @@ public class Person {
             return;
         }
         this.id = id;
+    }
+      public void setName(String name) {
+        if (name == null || name.trim().isEmpty()) {
+            System.out.println("Warning: Name cannot be empty. Ignoring.");
+            return;
+        }
+        if (!name.trim().matches("[a-zA-Z ]+")) {
+            System.out.println("Warning: Name should contain only letters. Ignoring: " + name);
+            return;
+        }
+        this.name = name.trim();
+    }
+ 
+    public void setEmail(String email) {
+        if (email == null || email.trim().isEmpty()) {
+            System.out.println("Warning: Email cannot be empty. Ignoring.");
+            return;
+        }
+        if (!email.contains("@") || !email.contains(".")) {
+            System.out.println("Warning: Invalid email format. Ignoring: " + email);
+            return;
+        }
+        this.email = email.trim().toLowerCase();
+    }
+ 
+ 
+    // =========================================================
+    // ABSTRACT METHOD — displayInfo()
+    // =========================================================
+    // This forces EVERY child class to provide their own version.
+    // No body here — just the signature.
+    //
+    // WHY abstract and not a concrete method?
+    // Because how a Member displays their profile is different from
+    // how a Librarian displays theirs. We can't write one version
+    // that works for both — so we just declare "you must have this method"
+    // and let each child decide how it looks.
+    //
+    // If a child class does NOT implement displayInfo(), Java gives
+    // a compile error. It's a contract that cannot be broken.
+ 
+    public abstract void displayInfo();
+ 
+ 
+    // =========================================================
+    // CONCRETE method — toString()
+    // =========================================================
+    // This IS shared and the same for everyone — just a basic summary.
+    // Children inherit this exactly as-is.
+ 
+    public String toString() {
+        return "[" + this.id + "] " + this.name + " (" + this.email + ")";
     }
 }
