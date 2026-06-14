@@ -1,134 +1,145 @@
 /*
  * ============================================================
- * DAY 2 — Main.java
+ * DAY 3 — Main.java
  * ============================================================
- * Tests both Book (refactored) and Member (new)
- * Specifically demonstrates:
- *   1. Validation rejecting bad data
- *   2. Member borrowing and returning books
- *   3. Borrow limit enforcement
+ * Tests all inheritance concepts:
+ *   1. Creating Student, Teacher, Librarian objects
+ *   2. Demonstrating inherited fields/methods
+ *   3. Polymorphic reference (Person p = new Student(...))
+ *   4. super.displayInfo() chaining
+ *   5. Showing what you CANNOT do with abstract Person
  */
- 
+
 public class main {
- 
+
     public static void main(String[] args) {
- 
+
         System.out.println("========================================");
-        System.out.println("  LIBRARY MANAGEMENT SYSTEM — Day 2    ");
+        System.out.println("  LIBRARY MANAGEMENT SYSTEM — Day 3    ");
         System.out.println("========================================\n");
- 
- 
+
+
         // =====================================================
-        // PART 1: Testing Book validation (encapsulation)
+        // PART 1: Creating objects — notice the constructors
         // =====================================================
-        System.out.println("--- PART 1: Book Validation ---\n");
- 
-        Books book1 = new Books(101, "The Alchemist",     "Paulo Coelho",     "Fiction",   3);
-        Books book2 = new Books(102, "Harry Potter",      "J.K. Rowling",     "Fantasy",   5);
-        Books book3 = new Books(103, "Clean Code",        "Robert C. Martin", "Tech",      2);
-        Books book4 = new Books(104, "Wings of Fire",     "A.P.J. Abdul Kalam","Biography",1);
- 
-        book1.displayInfo();
-          // Try to SET invalid values — watch validation kick in
-        System.out.println("Trying to set empty title:");
-        book1.setTitle("");                  // should warn and reject
- 
-        System.out.println("Trying to set negative ID:");
-        book1.setId(-5);                     // should warn and reject
- 
-        System.out.println("Trying to set 999 available copies:");
-        book1.setAvailableCopies(999);       // should warn and reject
- 
-        System.out.println("\nbook1 after all invalid attempts (unchanged):");
-        book1.displayInfo();
- 
- 
+        System.out.println("--- PART 1: Creating all person types ---\n");
+
+        // Student: uses Person's id/name/email + Member's borrowedBooks + Student's grade
+        Student student1 = new Student(201, "Aniket Sharma", "aniket@email.com", "B.Tech 2nd Year", "CS-2024-01");
+        Student student2 = new Student(202, "Priya Singh",   "priya@email.com",  "B.Tech 3rd Year", "CS-2023-07");
+
+        // Teacher: uses Person + Member(TEACHER limit=5) + Teacher's department
+        Teacher teacher1 = new Teacher(301, "Dr. Roy",    "droy@school.edu",  "Computer Science", "TCH-001");
+        Teacher teacher2 = new Teacher(302, "Prof. Gupta","gupta@school.edu", "Mathematics",      "TCH-002");
+
+        // Librarian: uses Person only + Librarian's own fields
+        Librarian lib1 = new Librarian(401, "Mrs. Das", "das@library.edu", "LIB-001", "MORNING");
+
+        student1.displayInfo();
+        teacher1.displayInfo();
+        lib1.displayInfo();
+
+
         // =====================================================
-        // PART 2: Creating Members with validation
+        // PART 2: Inherited methods — no code duplication
         // =====================================================
-        System.out.println("\n--- PART 2: Member Creation ---\n");
- 
-        Member student1 = new Member(201, "Aniket Sharma",  "aniket@email.com",  "STUDENT");
-        Member student2 = new Member(202, "Priya Singh",    "priya@email.com",   "STUDENT");
-        Member teacher1 = new Member(301, "Dr. Roy",        "droy@school.edu",   "TEACHER");
- 
-        student1.displayProfile();
-        teacher1.displayProfile();
- 
-        // Test bad member data
-        System.out.println("Trying invalid email:");
-        Member bad1 = new Member(203, "Test User", "notanemail", "STUDENT"); // bad email
-        System.out.println();
- 
-        System.out.println("Trying empty name:");
-        Member bad2 = new Member(204, "", "test@email.com", "STUDENT");      // empty name
-        System.out.println();
- 
- 
-        // =====================================================
-        // PART 3: Borrow logic — limit enforcement
-        // =====================================================
-        System.out.println("\n--- PART 3: Borrow Logic ---\n");
- 
-        // student1 can borrow max 3 books
+        System.out.println("\n--- PART 2: Inherited fields and methods ---\n");
+
+        // getName(), getEmail() are defined in Person
+        // Student didn't write them, but can use them
+        System.out.println("student1 name  (inherited): " + student1.getName());
+        System.out.println("teacher1 email (inherited): " + teacher1.getEmail());
+        System.out.println("lib1 toString  (inherited): " + lib1.toString());
+
+        // borrowBook() is defined in Member
+        // Student didn't write it, but inherits it
         student1.borrowBook("The Alchemist");
-        student1.borrowBook("Harry Potter");
         student1.borrowBook("Clean Code");
- 
-        // This 4th one should be REJECTED — limit is 3
+        student1.borrowBook("Harry Potter");
+
+        // 4th book should be rejected — limit is 3 (set in Member for STUDENT)
         student1.borrowBook("Wings of Fire");
- 
+
         System.out.println();
-        student1.displayProfile();
- 
-        // teacher1 can borrow max 5 books
-        System.out.println("\nTeacher borrowing (limit = 5):");
+        student1.displayInfo();
+
+        // Teacher gets 5 books
+        System.out.println("\nTeacher borrow limit = 5:");
         teacher1.borrowBook("The Alchemist");
-        teacher1.borrowBook("Harry Potter");
         teacher1.borrowBook("Clean Code");
+        teacher1.borrowBook("Harry Potter");
         teacher1.borrowBook("Wings of Fire");
         teacher1.borrowBook("Atomic Habits");
-        // 6th should be rejected
-        teacher1.borrowBook("Extra Book");
- 
+        teacher1.borrowBook("Extra Book"); // 6th — rejected
         System.out.println();
-        teacher1.displayProfile();
- 
- 
+        teacher1.displayInfo();
+
+
         // =====================================================
-        // PART 4: Return a book
+        // PART 3: Polymorphic reference — KEY CONCEPT
         // =====================================================
-        System.out.println("\n--- PART 4: Return a book ---\n");
- 
-        student1.returnBook("Harry Potter");
-        System.out.println();
-        student1.displayProfile();
- 
-        // Try returning something they don't have
-        student1.returnBook("Wings of Fire");
- 
- 
+        System.out.println("\n--- PART 3: Polymorphic reference ---\n");
+
+        // You can store a Student object in a Person variable
+        // because Student IS-A Person
+        //
+        // Person p = new Person(...); ← COMPILE ERROR: Person is abstract
+        // Person p = new Student(...); ← WORKS: Student is a concrete Person
+        //
+        // WHY is this useful?
+        // You can write methods that work with Person, and pass
+        // Student, Teacher, or Librarian — all work.
+
+        Person p1 = new Student(203, "Ravi Kumar", "ravi@email.com", "B.Sc 1st Year", "SC-2025-01");
+        Person p2 = new Teacher(303, "Dr. Mehta",  "mehta@school.edu", "Physics", "TCH-003");
+        Person p3 = new Librarian(402, "Mr. Sen",  "sen@library.edu", "LIB-002", "EVENING");
+
+        // displayInfo() is called — but WHICH version runs?
+        // Java checks the ACTUAL object type at runtime and calls
+        // the right displayInfo(). This is called runtime polymorphism.
+        // We'll deep dive into this on Day 4.
+        System.out.println("Calling displayInfo() on Person references:");
+        p1.displayInfo();   // runs Student's displayInfo()
+        p2.displayInfo();   // runs Teacher's displayInfo()
+        p3.displayInfo();   // runs Librarian's displayInfo()
+
+
         // =====================================================
-        // PART 5: Borrow + Book together
+        // PART 4: Librarian actions
         // =====================================================
-        System.out.println("\n--- PART 5: Book + Member working together ---\n");
- 
-        System.out.println("book4 before borrow:");
-        book4.displayInfo();
- 
-        // Step 1: check if member can borrow
-        // Step 2: check if book has copies
-        // Step 3: update both
-        if (student2.canBorrow() && book4.borrow()) {
-            student2.borrowBook(book4.getTitle());
-            System.out.println("Transaction successful!");
-        }
- 
-        System.out.println("\nbook4 after borrow:");
-        book4.displayInfo();
- 
-        System.out.println("\nstudent2 after borrow:");
-        student2.displayProfile();
+        System.out.println("\n--- PART 4: Librarian managing the library ---\n");
+
+        lib1.addBook("Design Patterns");
+        lib1.registerMember("Sona Das");
+        lib1.processBorrow("Aniket Sharma", "Design Patterns");
+        lib1.processReturn("Aniket Sharma", "Design Patterns");
+
+
+        // =====================================================
+        // PART 5: Validation inherited from Person
+        // =====================================================
+        System.out.println("\n--- PART 5: Validation works for all types ---\n");
+
+        // Validation in Person.setName() protects ALL subclasses
+        Student badStudent = new Student(204, "", "valid@email.com", "10th", "S-001");
+        // name was empty → Person's setName() rejected it → name stays null/default
+        System.out.println("Bad student name: '" + badStudent.getName() + "'");
+
+        Teacher badTeacher = new Teacher(304, "Dr. Valid", "notanemail", "Science", "TCH-004");
+        // email had no @ → Person's setEmail() rejected it → email stays null/default
+        System.out.println("Bad teacher email: '" + badTeacher.getEmail() + "'");
+
+
+        // =====================================================
+        // INHERITANCE CHAIN SUMMARY — printed for clarity
+        // =====================================================
+        System.out.println("\n--- Inheritance chain summary ---\n");
+        System.out.println("student1 instanceof Student  : " + (student1 instanceof Student));
+        System.out.println("student1 instanceof Member   : " + (student1 instanceof Member));
+        System.out.println("student1 instanceof Person   : " + (student1 instanceof Person));
+        System.out.println("teacher1 instanceof Member   : " + (teacher1 instanceof Member));
+        System.out.println("lib1     instanceof Member   : " + (lib1 instanceof Member));   // false!
+        System.out.println("lib1     instanceof Person   : " + (lib1 instanceof Person));   // true
+        // instanceof tells you: "is this object an instance of this type or any parent type?"
     }
 }
- 
