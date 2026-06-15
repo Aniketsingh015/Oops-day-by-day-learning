@@ -1,183 +1,142 @@
 /*
  * ============================================================
- * DAY 2 — Member.java  (Brand new class)
+ * DAY 3 — Member.java  (Refactored to extend Person)
  * ============================================================
  *
- * A Member is anyone who has a library card — student or teacher.
- * For now they're the same class. On Day 3 (Inheritance) we'll
- * split them into Student and Teacher subclasses.
+ * WHAT CHANGED FROM DAY 2:
+ *   - "extends Person" added
+ *   - id, name, email fields REMOVED (they live in Person now)
+ *   - setId/setName/setEmail REMOVED (inherited from Person)
+ *   - Constructor now calls super(...) first
+ *   - displayInfo() now has @Override annotation
+ *   - Everything else stays the same
  *
- * NEW CONCEPT TODAY: ArrayList
- * A Member holds a LIST of borrowed books.
- * We can't use a plain array (int[]) because arrays have fixed size.
- * ArrayList grows automatically as books are added/removed.
+ * KEY CONCEPT — super(...):
+ * The very first line of a child constructor MUST call super(...)
+ * to initialize the parent's fields. Java actually enforces this:
+ * if you don't write super(...), Java inserts super() automatically —
+ * but only if the parent has a no-arg constructor. Since Person's
+ * constructor requires id/name/email, we MUST call it explicitly.
  *
- * import java.util.ArrayList;  ← we need this to use ArrayList
+ * Order of execution when you write "new Member(201, "Aniket", ...)":
+ *   1. Member constructor starts
+ *   2. super(id, name, email) → jumps to Person constructor
+ *   3. Person sets id, name, email
+ *   4. Returns to Member constructor
+ *   5. Member sets its own extra fields (borrowedBooks, maxBorrowLimit)
  */
- 
+
 import java.util.ArrayList;
 
-public class Member {
- 
+public class Member extends Person {
+
     // =========================================================
-    // FIELDS — all private
+    // FIELDS — only what's UNIQUE to Member
     // =========================================================
- 
-    private int id;
-    private String name;
-    private String email;
-    private String memberType;          // "STUDENT" or "TEACHER"
-    private int maxBorrowLimit;         // students=3, teachers=5
- 
-    // ArrayList<String> means: a list that holds String values
-    // Each String will be a book title the member has borrowed
-    // We'll upgrade this to List<Book> on Day 6
+    // id, name, email are gone — Person owns them now.
+    // Member only declares what Person doesn't have.
+
+    private String memberType;
+    private int maxBorrowLimit;
     private ArrayList<String> borrowedBooks;
- 
- 
+
+
     // =========================================================
-    // CONSTRUCTOR — Parameterized
+    // CONSTRUCTOR
     // =========================================================
-    // We set maxBorrowLimit automatically based on memberType
-    // so the caller doesn't have to worry about the rules
- 
+
     public Member(int id, String name, String email, String memberType) {
-        setId(id);
-        setName(name);
-        setEmail(email);
-        setMemberType(memberType);     // this also sets maxBorrowLimit
-        this.borrowedBooks = new ArrayList<>();  // start with empty list
+        // super() must be the FIRST statement — no exceptions
+        // This calls Person(int id, String name, String email)
+        super(id, name, email);
+
+        // Now handle Member's own fields
+        setMemberType(memberType);
+        this.borrowedBooks = new ArrayList<>();
     }
+
+
     // =========================================================
-    // GETTERS
+    // GETTERS — only for Member's own fields
     // =========================================================
- 
-    public int getId()                          { return this.id; }
-    public String getName()                     { return this.name; }
-    public String getEmail()                    { return this.email; }
+    // getId(), getName(), getEmail() are inherited from Person
+    // No need to write them here at all
+
     public String getMemberType()               { return this.memberType; }
     public int getMaxBorrowLimit()              { return this.maxBorrowLimit; }
     public ArrayList<String> getBorrowedBooks() { return this.borrowedBooks; }
- 
-    // Calculated — how many books are currently borrowed
-    public int getBorrowedCount() {
-        return this.borrowedBooks.size();
-    }
- 
-    // Calculated — can this member borrow more books?
-    public boolean canBorrow() {
-        return this.borrowedBooks.size() < this.maxBorrowLimit;
-    }
+    public int getBorrowedCount()               { return this.borrowedBooks.size(); }
+    public boolean canBorrow()                  { return this.borrowedBooks.size() < this.maxBorrowLimit; }
+
 
     // =========================================================
-    // SETTERS — with validation
+    // SETTERS — only for Member's own fields
     // =========================================================
- 
-    public void setId(int id) {
-        if (id <= 0) {
-            System.out.println("Warning: Member ID must be positive. Ignoring: " + id);
-            return;
-        }
-        this.id = id;
-    }
- 
-    public void setName(String name) {
-        if (name == null || name.trim().isEmpty()) {
-            System.out.println("Warning: Member name cannot be empty. Ignoring.");
-            return;
-        }
-        // Only letters and spaces allowed in a name
-        // matches() checks if the string fits a pattern
-        // "[a-zA-Z ]+" means: one or more letters or spaces
-        if (!name.trim().matches("[a-zA-Z ]+")) {
-            System.out.println("Warning: Name should contain only letters. Ignoring: " + name);
-            return;
-        }
-        this.name = name.trim();
-    }
- 
-    public void setEmail(String email) {
-        if (email == null || email.trim().isEmpty()) {
-            System.out.println("Warning: Email cannot be empty. Ignoring.");
-            return;
-        }
-        // Basic email check: must contain "@" and a "."
-        // contains() checks if a string includes a substring
-        if (!email.contains("@") || !email.contains(".")) {
-            System.out.println("Warning: Invalid email format. Must contain '@' and '.'. Ignoring: " + email);
-            return;
-        }
-        this.email = email.trim().toLowerCase();
-    }
- 
+
     public void setMemberType(String memberType) {
-        if (memberType == null) {
-            this.memberType  = "STUDENT";
-            this.maxBorrowLimit = 3;
-            return;
-        }
-        // toUpperCase() so "student", "Student", "STUDENT" all work
-        String type = memberType.toUpperCase();
-        if (type.equals("TEACHER")) {
+        if (memberType != null && memberType.toUpperCase().equals("TEACHER")) {
             this.memberType     = "TEACHER";
-            this.maxBorrowLimit = 5;   // teachers get higher limit
+            this.maxBorrowLimit = 5;
         } else {
             this.memberType     = "STUDENT";
             this.maxBorrowLimit = 3;
         }
     }
+
+
     // =========================================================
-    // BORROW / RETURN a book title
+    // BORROW / RETURN — unchanged from Day 2
     // =========================================================
-    // For now we track book titles as Strings.
-    // On Day 6 we'll upgrade to actual Book objects.
- 
+
     public boolean borrowBook(String bookTitle) {
-        // Check 1: has this member hit their limit?
         if (!canBorrow()) {
-            System.out.println(this.name + " has reached the borrow limit of " + this.maxBorrowLimit + ".");
+            System.out.println(getName() + " has reached the borrow limit of " + this.maxBorrowLimit + ".");
             return false;
         }
-        // Check 2: do they already have this book?
         if (this.borrowedBooks.contains(bookTitle)) {
-            System.out.println(this.name + " has already borrowed '" + bookTitle + "'.");
+            System.out.println(getName() + " already has '" + bookTitle + "'.");
             return false;
         }
-        // All checks passed — add to their list
         this.borrowedBooks.add(bookTitle);
-        System.out.println(this.name + " borrowed '" + bookTitle + "'.");
+        System.out.println(getName() + " borrowed '" + bookTitle + "'.");
         return true;
     }
- 
+
     public boolean returnBook(String bookTitle) {
-        // remove() returns true if the item was found and removed
         if (this.borrowedBooks.remove(bookTitle)) {
-            System.out.println(this.name + " returned '" + bookTitle + "'.");
+            System.out.println(getName() + " returned '" + bookTitle + "'.");
             return true;
         }
-        System.out.println(this.name + " does not have '" + bookTitle + "' in their list.");
+        System.out.println(getName() + " does not have '" + bookTitle + "'.");
         return false;
     }
- 
- 
+
+
     // =========================================================
-    // displayProfile()
+    // displayInfo() — OVERRIDING the abstract method from Person
     // =========================================================
- 
-    public void displayProfile() {
+    // @Override tells the compiler: "I am intentionally replacing
+    // a method from the parent class."
+    //
+    // If you misspell the method name, @Override catches it:
+    // @Override
+    // public void displayinFo() { ... }  ← compile error! No such method in parent.
+    // Without @Override, Java would silently create a NEW method instead.
+    // Always use @Override when overriding — it's a safety net.
+
+    @Override
+    public void displayInfo() {
         System.out.println("=============================");
-        System.out.println("Member ID    : " + this.id);
-        System.out.println("Name         : " + this.name);
-        System.out.println("Email        : " + this.email);
+        System.out.println("Member ID    : " + getId());       // inherited getter
+        System.out.println("Name         : " + getName());     // inherited getter
+        System.out.println("Email        : " + getEmail());    // inherited getter
         System.out.println("Type         : " + this.memberType);
         System.out.println("Borrow Limit : " + this.maxBorrowLimit);
         System.out.println("Borrowed     : " + getBorrowedCount() + " / " + this.maxBorrowLimit);
- 
         if (this.borrowedBooks.isEmpty()) {
             System.out.println("Books        : (none)");
         } else {
-            System.out.println("Books        : ");
-            // Enhanced for-loop: reads as "for each book in borrowedBooks"
+            System.out.println("Books        :");
             for (String book : this.borrowedBooks) {
                 System.out.println("               - " + book);
             }
@@ -185,6 +144,3 @@ public class Member {
         System.out.println("=============================");
     }
 }
-    
-    
-
