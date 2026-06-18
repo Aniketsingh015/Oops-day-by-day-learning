@@ -201,3 +201,105 @@
 //         System.out.println("-----------------------------");
 //     }
 // }
+public class Books extends LibraryItem {
+ 
+    // Fields unique to Book
+    private String author;
+    private String genre;
+ 
+ 
+    // =========================================================
+    // CONSTRUCTOR
+    // =========================================================
+ 
+    public Books(int id, String title, String author, String genre, int totalCopies) {
+        super(id, title, totalCopies);   // LibraryItem handles id/title/copies
+        setAuthor(author);
+        setGenre(genre);
+    }
+ 
+ 
+    // Getters/setters for Book's own fields
+    public String getAuthor() { return this.author; }
+    public String getGenre()  { return this.genre; }
+ 
+    public void setAuthor(String author) {
+        if (author == null || author.trim().isEmpty()) {
+            System.out.println("Warning: Author cannot be empty. Ignoring.");
+            return;
+        }
+        this.author = author.trim();
+    }
+ 
+    public void setGenre(String genre) {
+        if (genre == null || genre.trim().isEmpty()) {
+            this.genre = "Uncategorized";
+            return;
+        }
+        this.genre = genre.trim();
+    }
+ 
+ 
+    // =========================================================
+    // @Override getLoanPeriod()
+    // =========================================================
+    // Books can be kept for 14 days — the standard loan period.
+ 
+    @Override
+    public int getLoanPeriod() {
+        return 14;
+    }
+ 
+ 
+    // =========================================================
+    // @Override displayInfo()
+    // =========================================================
+    // Books need to show author and genre, which LibraryItem
+    // doesn't know about. So we replace the parent's version entirely.
+ 
+    @Override
+    public void displayInfo() {
+        System.out.println("-----------------------------");
+        System.out.println("[BOOK]");
+        System.out.println("ID               : " + getId());
+        System.out.println("Title            : " + getTitle());
+        System.out.println("Author           : " + this.author);
+        System.out.println("Genre            : " + this.genre);
+        System.out.println("Total Copies     : " + getTotalCopies());
+        System.out.println("Available Copies : " + getAvailableCopies());
+        System.out.println("Loan Period      : " + getLoanPeriod() + " days");
+        System.out.println("Status           : " + (isAvailable() ? "Available" : "All Copies Borrowed"));
+        System.out.println("-----------------------------");
+    }
+ 
+ 
+    // =========================================================
+    // OVERLOADED searchItem() methods — 3 versions
+    // =========================================================
+    // These are STATIC because searching doesn't belong to one
+    // specific book — it's a general utility that checks if THIS
+    // book matches some criteria. We'll use these properly
+    // inside the Library class on Day 6.
+    //
+    // Notice: same method name "searchItem", but Java tells them
+    // apart by their PARAMETER TYPES. This is overloading.
+ 
+    // Version 1: search by ID
+    public boolean searchItem(int searchId) {
+        return this.getId() == searchId;
+    }
+ 
+    // Version 2: search by title (case-insensitive, partial match)
+    public boolean searchItem(String searchTitle) {
+        if (searchTitle == null) return false;
+        return this.getTitle().toLowerCase().contains(searchTitle.toLowerCase());
+    }
+ 
+    // Version 3: search by title AND author together
+    public boolean searchItem(String searchTitle, String searchAuthor) {
+        boolean titleMatches  = searchItem(searchTitle); // reuse Version 2!
+        boolean authorMatches = this.author.toLowerCase().contains(searchAuthor.toLowerCase());
+        return titleMatches && authorMatches;
+    }
+}
+ 
